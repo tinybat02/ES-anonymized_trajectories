@@ -1,0 +1,21 @@
+{
+  "type": "panel",
+  "name": "ES Anonymized Trajectories",
+  "id": "id-es-anonymized_trajectories",
+  "dataFormats": ["table"],
+  "info": {
+    "description": "ES Anonymized Trajectories",
+    "author": {
+      "name": "Nam Le"
+    },
+    "keywords": [],
+    "screenshots": [],
+    "version": "1.0.0",
+    "updated": "2020-07-30"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "6.3.x",
+    "plugins": []
+  }
+}
