@@ -56290,7 +56290,6 @@ function (_super) {
         zoom_level = _a.zoom_level,
         center_lon = _a.center_lon,
         center_lat = _a.center_lat;
-    console.log('anonymized ', this.props.data);
     var carto = new ol_layer__WEBPACK_IMPORTED_MODULE_4__["Tile"]({
       source: new ol_source_XYZ__WEBPACK_IMPORTED_MODULE_3__["default"]({
         url: 'https://{1-4}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
@@ -56338,7 +56337,8 @@ function (_super) {
   MainPanel.prototype.componentDidUpdate = function (prevProps, prevState) {
     if (prevProps.data.series !== this.props.data.series) {
       this.setState({
-        currentTrace: 'None'
+        currentTrace: 'None',
+        listTrace: []
       });
       this.map.removeLayer(this.traceLayer);
 

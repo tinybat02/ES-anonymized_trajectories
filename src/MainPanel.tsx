@@ -32,7 +32,6 @@ export class MainPanel extends PureComponent<Props, State> {
 
   componentDidMount() {
     const { tile_url, zoom_level, center_lon, center_lat } = this.props.options;
-    console.log('anonymized ', this.props.data);
 
     const carto = new TileLayer({
       source: new XYZ({
@@ -78,7 +77,7 @@ export class MainPanel extends PureComponent<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     if (prevProps.data.series !== this.props.data.series) {
-      this.setState({ currentTrace: 'None' });
+      this.setState({ currentTrace: 'None', listTrace: [] });
       this.map.removeLayer(this.traceLayer);
 
       if (this.props.data.series.length > 0) {
