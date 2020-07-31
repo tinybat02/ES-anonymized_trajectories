@@ -56475,13 +56475,13 @@ var defaults = {
 /*!**************************!*\
   !*** ./utils/helpers.ts ***!
   \**************************/
-/*! exports provided: createLayer, createPolygon, processData */
+/*! exports provided: createLayer, getCenterPolygon, processData */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createLayer", function() { return createLayer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createPolygon", function() { return createPolygon; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getCenterPolygon", function() { return getCenterPolygon; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "processData", function() { return processData; });
 /* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "../node_modules/tslib/tslib.es6.js");
 /* harmony import */ var ol_layer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ol/layer */ "../node_modules/ol/layer.js");
@@ -56511,70 +56511,20 @@ var createLayer = function createLayer(features) {
     zIndex: 2
   });
 };
-var createPolygon = function createPolygon(_long, lat
-/* , label: string */
-) {
-  // const polygonFeature = new Feature({
-  //   type: 'Polygon',
-  //   geometry: new Polygon([
-  //     [
-  //       [long.min, lat.min],
-  //       [long.max, lat.min],
-  //       [long.max, lat.max],
-  //       [long.min, lat.max],
-  //     ],
-  //   ]).transform('EPSG:4326', 'EPSG:3857'),
-  // });
-  var polygon = Object(_turf_helpers__WEBPACK_IMPORTED_MODULE_6__["polygon"])([[[_long.min, lat.min], [_long.max, lat.min], [_long.max, lat.max], [_long.min, lat.max], [_long.min, lat.min]]]); // const centerCoord = centroid(polygon as FeatureGeojson);
-
-  return _turf_centroid__WEBPACK_IMPORTED_MODULE_5___default()(polygon).geometry.coordinates; // #######
-  // const pointFeature = new Feature(new Point(centerCoord.geometry.coordinates).transform('EPSG:4326', 'EPSG:3857'));
-  // pointFeature.setStyle(
-  //   new Style({
-  //     image: new Circle({
-  //       radius: 5,
-  //       fill: new Fill({
-  //         color: 'rgba(255, 255, 255, 0.5)',
-  //       }),
-  //       stroke: new Stroke({
-  //         color: '#49A8DE',
-  //       }),
-  //     }),
-  //     text: new Text({
-  //       stroke: new Stroke({
-  //         color: '#ccc',
-  //         width: 1,
-  //       }),
-  //       font: '14px Calibri,sans-serif',
-  //       text: label,
-  //     }),
-  //   })
-  // );
-  // ######
-  // polygonFeature.setStyle(
-  //   new Style({
-  //     fill: new Fill({
-  //       color: 'rgba(255, 255, 255, 0.2)',
-  //     }),
-  //     stroke: new Stroke({
-  //       color: '#49A8DE',
-  //     }),
-  //     text: new Text({
-  //       stroke: new Stroke({
-  //         color: '#ccc',
-  //         width: 1,
-  //       }),
-  //       font: '14px Calibri,sans-serif',
-  //       text: label,
-  //       overflow: true,
-  //     }),
-  //   })
-  // );
-  // return pointFeature;
+var getCenterPolygon = function getCenterPolygon(_long, lat) {
+  var polygon = Object(_turf_helpers__WEBPACK_IMPORTED_MODULE_6__["polygon"])([[[_long.min, lat.min], [_long.max, lat.min], [_long.max, lat.max], [_long.min, lat.max], [_long.min, lat.min]]]);
+  return _turf_centroid__WEBPACK_IMPORTED_MODULE_5___default()(polygon).geometry.coordinates;
 };
 
 var createLineString = function createLineString(arr) {
-  return new ol_Feature__WEBPACK_IMPORTED_MODULE_3__["default"](new ol_geom_LineString__WEBPACK_IMPORTED_MODULE_8__["default"](arr).transform('EPSG:4326', 'EPSG:3857'));
+  var lineFeature = new ol_Feature__WEBPACK_IMPORTED_MODULE_3__["default"](new ol_geom_LineString__WEBPACK_IMPORTED_MODULE_8__["default"](arr).transform('EPSG:4326', 'EPSG:3857'));
+  lineFeature.setStyle(new ol_style__WEBPACK_IMPORTED_MODULE_4__["Style"]({
+    stroke: new ol_style__WEBPACK_IMPORTED_MODULE_4__["Stroke"]({
+      color: '#49A8DE',
+      width: 15
+    })
+  }));
+  return lineFeature;
 };
 
 var createPoints = function createPoints(arr) {
@@ -56593,7 +56543,7 @@ var createPoints = function createPoints(arr) {
           width: 1
         }),
         font: '14px Calibri,sans-serif',
-        text: "P" + (i + 1)
+        text: "" + (i + 1)
       })
     }));
     return pointFeature;
@@ -56603,23 +56553,14 @@ var createPoints = function createPoints(arr) {
 var processData = function processData(data) {
   var obj = {};
   data.fields[0].values.buffer.map(function (row) {
-    /*     if (!Array.isArray(row.points_list)) {
-      if (row.points_list.lat.min !== 0) {
-        obj[row.name.toString()] = [createPolygon(row.points_list.long, row.points_list.lat, 'P1')];
-      }
-    } else */
-    if (Array.isArray(row.points_list)) {
-      if (row.points_list.length >= 5) {
-        // const pFeatures: Feature[] = [];
-        var arrPoints_1 = [];
-        row.points_list.map(function (point, i) {
-          if (point.lat.min !== 0) {
-            // pFeatures.push(createPolygon(point.long, point.lat, `P${i + 1}`));
-            arrPoints_1.push(createPolygon(point["long"], point.lat));
-          }
-        });
-        obj[row.name.toString()] = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])([createLineString(arrPoints_1)], createPoints(arrPoints_1));
-      }
+    if (Array.isArray(row.points_list) && row.points_list.length >= 5) {
+      var arrPoints_1 = [];
+      row.points_list.map(function (point, i) {
+        if (point.lat.min !== 0) {
+          arrPoints_1.push(getCenterPolygon(point["long"], point.lat));
+        }
+      });
+      obj[row.name.toString()] = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__spread"])([createLineString(arrPoints_1)], createPoints(arrPoints_1));
     }
   });
   return obj;
