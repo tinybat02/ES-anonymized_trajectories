@@ -1,10 +1,8 @@
 import { Vector as VectorLayer } from 'ol/layer';
 import VectorSource from 'ol/source/Vector';
 import Feature from 'ol/Feature';
-import { Frame, MinMax, FeatureGeojson } from '../types';
+import { Frame, MinMax } from '../types';
 import { Style, Fill, Stroke, Text, Circle } from 'ol/style';
-import centroid from '@turf/centroid';
-import { polygon as createGeoPolygon } from '@turf/helpers';
 import Point from 'ol/geom/Point';
 import LineString from 'ol/geom/LineString';
 
@@ -17,17 +15,18 @@ export const createLayer = (features: Feature[]) =>
   });
 
 export const getCenterPolygon = (long: MinMax, lat: MinMax) => {
-  const polygon = createGeoPolygon([
-    [
-      [long.min, lat.min],
-      [long.max, lat.min],
-      [long.max, lat.max],
-      [long.min, lat.max],
-      [long.min, lat.min],
-    ],
-  ]);
+  // const polygon = createGeoPolygon([
+  //   [
+  //     [long.min, lat.min],
+  //     [long.max, lat.min],
+  //     [long.max, lat.max],
+  //     [long.min, lat.max],
+  //     [long.min, lat.min],
+  //   ],
+  // ]);
 
-  return centroid(polygon as FeatureGeojson).geometry.coordinates;
+  // return centroid(polygon as FeatureGeojson).geometry.coordinates;
+  return [(long.min + long.max) / 2, (lat.min + lat.max) / 2];
 };
 
 const createLineString = (arr: number[][]) => {
